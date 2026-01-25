@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>zCleaner | Clean. Ghost. Repeat.</title>
+    <link rel="icon" type="image/png" href="assets/logo.png">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- 1. CORE VARIABLES & RESET --- */
+        :root {
+            --bg-dark: #050505;
+            --bg-card: rgba(20, 20, 20, 0.6);
+            --primary: #bf00ff; /* Violet Néon */
+            --primary-dim: rgba(191, 0, 255, 0.1);
+            --secondary: #ff0000; /* Rouge Sang */
+            --success: #00ff41; /* Vert Hacker */
+            --discord: #5865F2; /* Couleur Discord */
+            --telegram: #229ED9; /* Couleur Telegram */
+            
+            --text-main: #e0e0e0;
+            --text-muted: #9ca3af;
+            
+            --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+            --blur: blur(20px);
+            
+            --font-display: 'Roboto Mono', monospace;
+            --font-body: 'Inter', sans-serif;
+            
+            --transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* --- BACKGROUND NOISE & GLOW --- */
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+            pointer-events: none; z-index: -1;
+        }
+
+        .ambient-glow {
+            position: fixed; width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(191,0,255,0.15) 0%, rgba(0,0,0,0) 70%);
+            top: -100px; left: 50%; transform: translateX(-50%);
+            z-index: -2; pointer-events: none;
+            animation: pulseGlow 8s infinite alternate;
+        }
+
+        /* --- TYPOGRAPHY --- */
+        h1, h2, h3, h4 { font-family: var(--font-display); text-transform: uppercase; letter-spacing: -0.5px; }
+        .section-title {
+            font-size: clamp(2rem, 5vw, 3rem); text-align: center; margin-bottom: 3rem;
+            position: relative; left: 50%; transform: translateX(-50%); display: inline-block;
+        }
+        .section-title span { color: var(--primary); text-shadow: 0 0 15px rgba(191, 0, 255, 0.5); }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+
+        /* --- HEADER --- */
+        header {
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            background: rgba(5, 5, 5, 0.7); backdrop-filter: var(--blur);
+            border-bottom: var(--glass-border); padding: 0.8rem 0;
+        }
+        nav { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto; padding: 0 2rem; }
+        
+        /* LOGO STYLE */
+        .logo img {
+            height: 40px; /* Ajuste la hauteur ici */
+            width: auto;
+            display: block;
+            filter: drop-shadow(0 0 5px var(--primary));
+        }
+
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a {
+            color: var(--text-muted); text-decoration: none; font-size: 0.9rem; font-weight: 600;
+            transition: var(--transition); position: relative;
+        }
+        .nav-links a:hover, .nav-links a.active { color: white; text-shadow: 0 0 8px rgba(255,255,255,0.5); }
+        
+        .btn-top {
+            display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1.2rem;
+            border: 1px solid var(--primary); border-radius: 50px; color: white;
+            text-decoration: none; font-size: 0.85rem; font-weight: bold;
+            background: var(--primary-dim); transition: var(--transition);
+        }
+        .btn-top:hover { background: var(--primary); box-shadow: 0 0 20px rgba(191, 0, 255, 0.6); }
+
+        /* --- HERO --- */
+        #home { height: 100vh; display: flex; align-items: center; justify-content: center; padding-top: 80px; }
+        .hero-content { text-align: center; z-index: 2; max-width: 900px; }
+        .hero-title { font-size: clamp(3rem, 8vw, 6rem); font-weight: 700; line-height: 1; margin-bottom: 1.5rem; }
+        
+        .glitch-text { position: relative; color: white; }
+        .glitch-text::before, .glitch-text::after {
+            content: "CLEAN. GHOST. REPEAT."; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-dark);
+        }
+        .glitch-text::before { left: 2px; text-shadow: -1px 0 var(--secondary); clip-path: inset(44% 0 61% 0); animation: glitch 3s infinite linear alternate-reverse; }
+        .glitch-text::after { left: -2px; text-shadow: -1px 0 var(--primary); clip-path: inset(24% 0 21% 0); animation: glitch2 2s infinite linear alternate-reverse; }
+        
+        .hero-subtitle { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 3rem; font-weight: 300; }
+        .btn-main {
+            display: inline-block; padding: 1.2rem 4rem; background: transparent; border: 2px solid var(--primary);
+            color: white; font-family: var(--font-display); font-weight: 700; text-decoration: none;
+            text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 0 15px rgba(191, 0, 255, 0.3); transition: var(--transition);
+        }
+        .btn-main:hover { background: var(--primary); box-shadow: 0 0 40px rgba(191, 0, 255, 0.8); transform: translateY(-2px); }
+        .hero-visual { margin-top: 4rem; width: 100%; max-width: 800px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: float 6s ease-in-out infinite; }
+
+        /* --- FEATURES (BENTO GRID FIX) --- */
+        #features { padding: 8rem 0; }
+        .bento-grid {
+            display: grid;
+            /* Force 2 colonnes égales pour un layout symétrique */
+            grid-template-columns: 1fr 1fr; 
+            gap: 1.5rem;
+        }
+
+        /* La première carte prend toute la largeur */
+        .card-full { grid-column: 1 / -1; }
+
+        .bento-card {
+            background: var(--bg-card); backdrop-filter: var(--blur); border: var(--glass-border);
+            padding: 2rem; border-radius: 16px; transition: var(--transition); opacity: 0; transform: translateY(30px);
+        }
+        .bento-card:hover { border-color: var(--primary); transform: translateY(-5px); box-shadow: 0 10px 30px var(--primary-dim); }
+        .bento-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+        .bento-icon {
+            font-size: 1.5rem; color: var(--primary); background: var(--primary-dim);
+            width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 8px;
+        }
+        .bento-list { list-style: none; }
+        .bento-list li { margin-bottom: 0.8rem; font-size: 0.95rem; color: var(--text-muted); display: flex; align-items: center; }
+        .bento-list li::before { content: "▹"; color: var(--primary); margin-right: 10px; }
+
+        /* --- STATUS --- */
+        #status { padding: 4rem 0; }
+        .terminal-window {
+            background: rgba(10, 10, 10, 0.95); border: 1px solid #333; border-radius: 8px;
+            font-family: var(--font-display); box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        }
+        .terminal-header { background: #1a1a1a; padding: 0.8rem; display: flex; gap: 8px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .red { background: #ff5f56; } .yellow { background: #ffbd2e; } .green { background: #27c93f; }
+        .terminal-body { padding: 2rem; color: #cfcfcf; }
+        
+        .status-grid { display: flex; flex-wrap: wrap; gap: 2rem; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #333; }
+        .status-item {
+            display: flex; align-items: center; gap: 1rem; background: rgba(255,255,255,0.05);
+            padding: 0.8rem 1.5rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .status-badge {
+            background: rgba(0, 255, 65, 0.1); color: var(--success); padding: 0.3rem 0.8rem;
+            border-radius: 4px; font-size: 0.8rem; font-weight: bold; animation: pulseGreen 2s infinite;
+        }
+        .security-warning { color: var(--secondary); margin-top: 2rem; font-size: 0.9rem; border-left: 3px solid var(--secondary); padding-left: 1rem; }
+
+        /* --- FAQ --- */
+        #faq { padding: 6rem 0; }
+        .accordion { display: flex; flex-direction: column; gap: 1rem; max-width: 800px; margin: 0 auto; }
+        .accordion-item { background: var(--bg-card); border: var(--glass-border); border-radius: 8px; overflow: hidden; transition: var(--transition); }
+        .accordion-header { padding: 1.5rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
+        .accordion-header:hover { background: rgba(255,255,255,0.02); color: var(--primary); }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; padding: 0 1.5rem; color: var(--text-muted); }
+        .accordion-item.active { border-color: var(--primary); }
+        .accordion-item.active .accordion-content { padding-bottom: 1.5rem; }
+
+        /* --- TEAM (BUTTONS FIX) --- */
+        #team { padding: 6rem 0; }
+        .team-grid { display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap; }
+        .team-card {
+            background: var(--bg-card); backdrop-filter: var(--blur); border: var(--glass-border);
+            padding: 2.5rem; border-radius: 16px; text-align: center; width: 320px;
+            transition: var(--transition); overflow: hidden;
+        }
+        .team-card:hover { transform: translateY(-10px); border-color: var(--secondary); }
+        
+        .profile-img-container {
+            width: 120px; height: 120px; margin: 0 auto 1.5rem; position: relative; border-radius: 50%; padding: 5px;
+            background: linear-gradient(45deg, var(--primary), transparent, var(--secondary));
+        }
+        .profile-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: #111; }
+        .team-role { color: var(--primary); font-size: 0.9rem; font-family: var(--font-display); margin-bottom: 1.5rem; }
+
+        /* Team Buttons Container */
+        .team-socials {
+            display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1.5rem;
+        }
+        .btn-social {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            padding: 0.6rem 1rem; border-radius: 8px; text-decoration: none;
+            color: white; font-weight: 600; font-size: 0.85rem; transition: var(--transition);
+        }
+        /* Discord Button */
+        .btn-discord { background: rgba(88, 101, 242, 0.15); border: 1px solid var(--discord); }
+        .btn-discord:hover { background: var(--discord); box-shadow: 0 0 15px rgba(88, 101, 242, 0.4); }
+        /* Telegram Button */
+        .btn-telegram { background: rgba(34, 158, 217, 0.15); border: 1px solid var(--telegram); }
+        .btn-telegram:hover { background: var(--telegram); box-shadow: 0 0 15px rgba(34, 158, 217, 0.4); }
+
+        /* --- FOOTER --- */
+        footer { padding: 3rem 0; text-align: center; border-top: var(--glass-border); color: #666; font-size: 0.9rem; }
+        .footer-links a { color: #888; text-decoration: none; margin: 0 10px; }
+        .footer-links a:hover { color: white; }
+
+        /* --- KEYFRAMES --- */
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        @keyframes glitch { 0% { clip-path: inset(80% 0 5% 0); transform: translate(-2px, 1px); } 100% { clip-path: inset(10% 0 80% 0); transform: translate(1px, -2px); } }
+        @keyframes glitch2 { 0% { clip-path: inset(10% 0 80% 0); transform: translate(1px, -1px); } 100% { clip-path: inset(80% 0 5% 0); transform: translate(-1px, 1px); } }
+        @keyframes pulseGlow { 0% { opacity: 0.5; transform: translateX(-50%) scale(1); } 100% { opacity: 0.8; transform: translateX(-50%) scale(1.1); } }
+        @keyframes pulseGreen { 0%, 100% { opacity: 1; text-shadow: 0 0 5px var(--success); } 50% { opacity: 0.7; text-shadow: none; } }
+        @keyframes spinBorder { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .show { opacity: 1 !important; transform: translateY(0) !important; }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hero-title { font-size: 2.5rem; }
+            .bento-grid { grid-template-columns: 1fr; } /* 1 colonne sur mobile */
+            .card-full { grid-column: auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow"></div>
+
+    <header>
+        <nav>
+            <a href="#" class="logo">
+                <img src="assets/logo.png" alt="zCleaner Logo">
+            </a>
+
+            <div class="nav-links">
+                <a href="#home">ACCUEIL</a>
+                <a href="#features">FONCTIONNALITÉS</a>
+                <a href="#status">STATUS</a>
+                <a href="#faq">FAQ</a>
+                <a href="#team">ÉQUIPE</a>
+            </div>
+            <a href="https://t.me/zcleanerfr" target="_blank" class="btn-top">
+                <i class="fab fa-telegram-plane"></i> SUPPORT
+            </a>
+        </nav>
+    </header>
+
+    <section id="home">
+        <div class="container hero-content">
+            <h1 class="hero-title glitch-text">CLEAN. GHOST. REPEAT.</h1>
+            <p class="hero-subtitle">Le meilleur cleaner pour vos cheats. Effacez toutes vos traces, contournez tout.<br>Développé par des cheaters, pour des cheaters.</p>
+                <a href="assets/zCleaner.rar" download="zCleaner.rar" class="btn-main">
+                    TÉLÉCHARGER zCLEANER
+                </a>
+            <div class="hero-visual-container">
+                <img src="assets/interface.jpg" alt="zCleaner Interface" class="hero-visual" onerror="this.style.display='none';">
+            </div>
+        </div>
+    </section>
+
+    <section id="features">
+        <div class="container">
+            <h2 class="section-title"><span>Capacités</span> De Clean</h2>
+            
+            <div class="bento-grid">
+                
+                <div class="bento-card card-full">
+                    <div class="bento-header">
+                        <div class="bento-icon"><i class="fas fa-globe"></i></div>
+                        <h3>Réseau & Web</h3>
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 2rem;">
+                        <ul class="bento-list">
+                            <li>Chrome, Firefox, Brave, Opera</li>
+                            <li>Cache DNS & Reset HOSTS</li>
+                        </ul>
+                        <ul class="bento-list">
+                            <li>Déblocage IP instantané</li>
+                            <li>Cookies & Local Storage</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bento-card">
+                    <div class="bento-header">
+                        <div class="bento-icon"><i class="fas fa-microchip"></i></div>
+                        <h3>Système & Privacy</h3>
+                    </div>
+                    <ul class="bento-list">
+                        <li>Downloads vidés</li>
+                        <li>Thumbnails (Miniatures)</li>
+                        <li>Presse-Papier & Fichiers Récents</li>
+                        <li>Prefetch & Windows.edb</li>
+                    </ul>
+                </div>
+
+                <div class="bento-card">
+                    <div class="bento-header">
+                        <div class="bento-icon"><i class="fab fa-discord"></i></div>
+                        <h3>Apps & Logs</h3>
+                    </div>
+                    <ul class="bento-list">
+                        <li>Discord (Cache/Logs/Chat)</li>
+                        <li>CrashDumps & WerFault</li>
+                        <li>Historique PowerShell</li>
+                        <li>Windows Defender History</li>
+                    </ul>
+                </div>
+
+                <div class="bento-card">
+                    <div class="bento-header">
+                        <div class="bento-icon"><i class="fas fa-search"></i></div>
+                        <h3>Forensics</h3>
+                    </div>
+                    <ul class="bento-list">
+                        <li>BAM & ShimCache</li>
+                        <li>UserAssist & ShellBags</li>
+                        <li>OpenSaveMRU</li>
+                        <li>Run & RunOnce Traces</li>
+                    </ul>
+                </div>
+
+                <div class="bento-card">
+                    <div class="bento-header">
+                        <div class="bento-icon"><i class="fas fa-memory"></i></div>
+                        <h3>Hardware & GPU</h3>
+                    </div>
+                    <ul class="bento-list">
+                        <li>Historique USB (USBSTOR)</li>
+                        <li>Pilotes Fantômes</li>
+                        <li>Logs Événements (.evtx)</li>
+                        <li>Cache Shader GPU</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="status">
+        <div class="container">
+            <div class="terminal-window reveal">
+                <div class="terminal-header">
+                    <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+                    <span style="margin-left: 10px; font-size: 0.8rem; color: #666;">root@zcleaner:~</span>
+                </div>
+                <div class="terminal-body">
+                    <p style="color: var(--primary); margin-bottom: 1rem;">> Initializing Bypass Protocol v1.3...</p>
+                    <p>> Connecting to Secure Server... OK</p>
+                    <br>
+                    <p style="color: var(--primary); margin-bottom: 1rem;">> Clean Capacity : 99.9%...</p>
+                    <br>
+                    <div class="status-grid">
+                        <div class="status-item"><i class="fas fa-shield-alt"></i><span>NAPSE</span><div class="status-badge">UNDETECTED</div></div>
+                        <div class="status-item"><i class="fas fa-shield-alt"></i><span>ECHOSCAN</span><div class="status-badge">UNDETECTED</div></div>
+                        <div class="status-item"><i class="fas fa-shield-alt"></i><span>OCEANSCAN</span><div class="status-badge">UNDETECTED</div></div>
+                    </div>
+                    <div class="security-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        ** WARNING: Contourne toutes les vérifications, y compris les vérifications manuelles (Screenshare).
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="faq">
+        <div class="container">
+            <h2 class="section-title"><span>F.A.Q</span></h2>
+            <div class="accordion reveal">
+                <div class="accordion-item">
+                    <div class="accordion-header">Le logiciel est-il détecté ? <i class="fas fa-chevron-down"></i></div>
+                    <div class="accordion-content"><p>Non. Nous utilisons des techniques de signature polymorphe et clear ses propres traces d'execution. Réferez vous au readme.txt dans le .rar de téléchargement.</p></div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">Est-ce compatible Windows 11 ? <i class="fas fa-chevron-down"></i></div>
+                    <div class="accordion-content"><p>Oui, zCleaner est optimisé pour Windows 10 et 11, sous ses formes 32 & 64 Bits.</p></div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">Comment fonctionne la licence ? <i class="fas fa-chevron-down"></i></div>
+                    <div class="accordion-content"><p>Pour l'instant, zCleaner est gratuit. Mais prochainement, une licence sera nescéssaire pour accéder à une version plus poussée.</p></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="team">
+        <div class="container">
+            <h2 class="section-title"><span>L'ÉQUIPE</span></h2>
+            <div class="team-grid">
+                
+                <div class="team-card reveal">
+                    <div class="profile-img-container">
+                        <img src="assets/z381.png" alt="z381" class="profile-img" onerror="this.src='https://via.placeholder.com/150/000000/FFFFFF?text=Z'">
+                    </div>
+                    <h3>asakaii</h3>
+                    <p class="team-role">Lead Developer <br>Project Leader</p>
+                    
+                    <div class="team-socials">
+                        <a href="#" class="btn-social btn-discord">
+                            <i class="fab fa-discord"></i> Discord
+                        </a>
+                        <a href="https://t.me/asaka2i" target="_blank" class="btn-social btn-telegram">
+                            <i class="fab fa-telegram"></i> Telegram
+                        </a>
+                    </div>
+                </div>
+
+                <div class="team-card reveal">
+                    <div class="profile-img-container">
+                        <img src="assets/swiift.png" alt="Swiift" class="profile-img" onerror="this.src='https://via.placeholder.com/150/000000/FFFFFF?text=S'">
+                    </div>
+                    <h3>SW</h3>
+                    <p class="team-role">Developper <br>Lead Communication</p>
+                    
+                    <div class="team-socials">
+                        <a href="#" class="btn-social btn-discord">
+                            <i class="fab fa-discord"></i> Discord
+                        </a>
+                        <a href="#" target="_blank" class="btn-social btn-telegram">
+                            <i class="fab fa-telegram"></i> Telegram
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <footer id="legal">
+        <div class="container">
+            <div class="footer-links">
+                <a href="#">CGU</a>
+                <a href="#">Politique de Confidentialité</a>
+                <a href="https://t.me/zcleanerfr">Telegram</a>
+            </div>
+            <p>Ce logiciel est fourni "en l'état". L'utilisation est à vos propres risques.<br>
+            Toute tentative de Reverse Engineering entraînera un ban HWID immédiat.</p>
+            <br>
+            <p style="color: var(--primary);">© 2026 zCleaner. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Scroll Reveal
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('show');
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.bento-card, .terminal-window, .team-card, .accordion').forEach(el => observer.observe(el));
+
+            // Accordion
+            document.querySelectorAll('.accordion-header').forEach(item => {
+                item.addEventListener('click', () => {
+                    const parent = item.parentElement;
+                    const content = item.nextElementSibling;
+                    document.querySelectorAll('.accordion-item').forEach(el => {
+                        if (el !== parent) {
+                            el.classList.remove('active');
+                            el.querySelector('.accordion-content').style.maxHeight = null;
+                        }
+                    });
+                    parent.classList.toggle('active');
+                    content.style.maxHeight = parent.classList.contains('active') ? content.scrollHeight + "px" : null;
+                });
+            });
+
+            // Nav Active State
+            window.addEventListener('scroll', () => {
+                let current = '';
+                document.querySelectorAll('section').forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= (sectionTop - section.clientHeight / 3)) current = section.getAttribute('id');
+                });
+                document.querySelectorAll('.nav-links a').forEach(a => {
+                    a.classList.remove('active');
+                    if (a.getAttribute('href').includes(current)) a.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
