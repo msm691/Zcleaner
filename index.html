@@ -16,18 +16,19 @@
         /* --- 1. CORE VARIABLES & RESET --- */
         :root {
             --bg-dark: #050505;
-            --bg-card: rgba(20, 20, 20, 0.6);
-            --primary: #bf00ff; /* Violet Néon */
+            /* On rend les cartes un peu plus transparentes pour voir la galaxie derrière */
+            --bg-card: rgba(20, 20, 20, 0.4); 
+            --primary: #bf00ff;
             --primary-dim: rgba(191, 0, 255, 0.1);
-            --secondary: #ff0000; /* Rouge Sang */
-            --success: #00ff41; /* Vert Hacker */
-            --discord: #5865F2; /* Couleur Discord */
-            --telegram: #229ED9; /* Couleur Telegram */
+            --secondary: #ff0000;
+            --success: #00ff41;
+            --discord: #5865F2;
+            --telegram: #229ED9;
             
             --text-main: #e0e0e0;
-            --text-muted: #9ca3af;
+            --text-muted: #d1d5db; /* Texte légèrement plus clair pour le contraste vidéo */
             
-            --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
             --blur: blur(20px);
             
             --font-display: 'Roboto Mono', monospace;
@@ -46,22 +47,41 @@
             line-height: 1.6;
         }
 
-        /* --- BACKGROUND NOISE & GLOW --- */
-        body::before {
-            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        /* --- 2. VIDEO BACKGROUND (NOUVEAU) --- */
+        .video-background {
+            position: fixed;
+            top: 0; right: 0; bottom: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -100; /* Tout au fond */
+            overflow: hidden;
+        }
+
+        .video-background video {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 100vw; height: 100vh;
+            transform: translate(-50%, -50%);
+            object-fit: cover; /* Remplit l'écran sans déformer */
+        }
+
+        /* Overlay sombre pour la lisibilité du texte */
+        .video-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 5, 5, 0.75); /* Ajuste 0.75 pour plus ou moins de clarté */
+            z-index: 1;
+        }
+        
+        /* Texture de bruit par dessus la vidéo pour l'effet "film/cyber" */
+        .video-noise {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
-            pointer-events: none; z-index: -1;
+            z-index: 2;
+            pointer-events: none;
         }
 
-        .ambient-glow {
-            position: fixed; width: 600px; height: 600px;
-            background: radial-gradient(circle, rgba(191,0,255,0.15) 0%, rgba(0,0,0,0) 70%);
-            top: -100px; left: 50%; transform: translateX(-50%);
-            z-index: -2; pointer-events: none;
-            animation: pulseGlow 8s infinite alternate;
-        }
-
-        /* --- TYPOGRAPHY --- */
+        /* --- 3. TYPOGRAPHY --- */
         h1, h2, h3, h4 { font-family: var(--font-display); text-transform: uppercase; letter-spacing: -0.5px; }
         .section-title {
             font-size: clamp(2rem, 5vw, 3rem); text-align: center; margin-bottom: 3rem;
@@ -70,21 +90,16 @@
         .section-title span { color: var(--primary); text-shadow: 0 0 15px rgba(191, 0, 255, 0.5); }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
 
-        /* --- HEADER --- */
+        /* --- 4. HEADER --- */
         header {
             position: fixed; top: 0; width: 100%; z-index: 1000;
-            background: rgba(5, 5, 5, 0.7); backdrop-filter: var(--blur);
+            background: rgba(5, 5, 5, 0.3); /* Plus transparent */
+            backdrop-filter: blur(10px);
             border-bottom: var(--glass-border); padding: 0.8rem 0;
         }
         nav { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto; padding: 0 2rem; }
         
-        /* LOGO STYLE */
-        .logo img {
-            height: 40px; 
-            width: auto;
-            display: block;
-            filter: drop-shadow(0 0 5px var(--primary));
-        }
+        .logo img { height: 40px; width: auto; display: block; filter: drop-shadow(0 0 5px var(--primary)); }
 
         .nav-links { display: flex; gap: 2rem; }
         .nav-links a {
@@ -98,38 +113,50 @@
             border: 1px solid var(--primary); border-radius: 50px; color: white;
             text-decoration: none; font-size: 0.85rem; font-weight: bold;
             background: var(--primary-dim); transition: var(--transition);
+            backdrop-filter: blur(5px);
         }
         .btn-top:hover { background: var(--primary); box-shadow: 0 0 20px rgba(191, 0, 255, 0.6); }
 
-        /* --- HERO --- */
+        /* --- 5. HERO --- */
         #home { height: 100vh; display: flex; align-items: center; justify-content: center; padding-top: 80px; }
-        .hero-content { text-align: center; z-index: 2; max-width: 900px; }
+        .hero-content { text-align: center; z-index: 2; max-width: 900px; display: flex; flex-direction: column; align-items: center; }
+        
+        .live-badge {
+            display: inline-flex; align-items: center; gap: 10px;
+            padding: 8px 16px; border-radius: 50px;
+            background: rgba(0, 255, 65, 0.1); border: 1px solid rgba(0, 255, 65, 0.3);
+            backdrop-filter: blur(5px);
+            color: var(--success); font-family: var(--font-display); font-size: 0.85rem; font-weight: bold;
+            margin-bottom: 2rem;
+        }
+        .live-dot {
+            width: 8px; height: 8px; background: var(--success); border-radius: 50%;
+            box-shadow: 0 0 10px var(--success); animation: pulseGreen 2s infinite;
+        }
+
         .hero-title { font-size: clamp(3rem, 8vw, 6rem); font-weight: 700; line-height: 1; margin-bottom: 1.5rem; }
         
         .glitch-text { position: relative; color: white; }
         .glitch-text::before, .glitch-text::after {
             content: "CLEAN. GHOST. REPEAT."; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-dark);
+            background: transparent; /* Transparent pour voir la video */
         }
         .glitch-text::before { left: 2px; text-shadow: -1px 0 var(--secondary); clip-path: inset(44% 0 61% 0); animation: glitch 3s infinite linear alternate-reverse; }
         .glitch-text::after { left: -2px; text-shadow: -1px 0 var(--primary); clip-path: inset(24% 0 21% 0); animation: glitch2 2s infinite linear alternate-reverse; }
         
         .hero-subtitle { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 3rem; font-weight: 300; }
         .btn-main {
-            display: inline-block; padding: 1.2rem 4rem; background: transparent; border: 2px solid var(--primary);
+            display: inline-block; padding: 1.2rem 4rem; background: rgba(0,0,0,0.3); border: 2px solid var(--primary);
+            backdrop-filter: blur(5px);
             color: white; font-family: var(--font-display); font-weight: 700; text-decoration: none;
             text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 0 15px rgba(191, 0, 255, 0.3); transition: var(--transition);
         }
         .btn-main:hover { background: var(--primary); box-shadow: 0 0 40px rgba(191, 0, 255, 0.8); transform: translateY(-2px); }
         .hero-visual { margin-top: 4rem; width: 100%; max-width: 800px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: float 6s ease-in-out infinite; }
 
-        /* --- FEATURES (BENTO GRID) --- */
+        /* --- 6. FEATURES (BENTO GRID) --- */
         #features { padding: 8rem 0; }
-        .bento-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr; 
-            gap: 1.5rem;
-        }
+        .bento-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
         .card-full { grid-column: 1 / -1; }
 
         .bento-card {
@@ -146,13 +173,36 @@
         .bento-list li { margin-bottom: 0.8rem; font-size: 0.95rem; color: var(--text-muted); display: flex; align-items: center; }
         .bento-list li::before { content: "▹"; color: var(--primary); margin-right: 10px; }
 
+        /* --- COMPARISON TABLE --- */
+        #comparison { padding: 4rem 0; }
+        .comparison-table {
+            width: 100%; max-width: 900px; margin: 0 auto;
+            border-collapse: collapse; color: var(--text-main);
+            background: var(--bg-card); backdrop-filter: var(--blur);
+            border: var(--glass-border); border-radius: 16px; overflow: hidden;
+        }
+        .comparison-table th, .comparison-table td { padding: 1.5rem; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .comparison-table th { background: rgba(0,0,0,0.3); font-family: var(--font-display); font-size: 1.1rem; letter-spacing: 1px; }
+        .comparison-table th.highlight { color: var(--primary); border-bottom: 2px solid var(--primary); background: rgba(191,0,255,0.05); }
+        .comparison-table tr:last-child td { border-bottom: none; }
+        .check { color: var(--success); font-size: 1.2rem; filter: drop-shadow(0 0 5px var(--success)); }
+        .cross { color: #555; font-size: 1.2rem; }
+        .feature-name { text-align: left; font-weight: 600; color: #fff; padding-left: 2rem; }
+        @media (max-width: 768px) {
+            .comparison-table { font-size: 0.85rem; }
+            .comparison-table th, .comparison-table td { padding: 1rem 0.5rem; }
+            .feature-name { padding-left: 1rem; }
+        }
+
         /* --- STATUS --- */
         #status { padding: 4rem 0; }
         .terminal-window {
-            background: rgba(10, 10, 10, 0.95); border: 1px solid #333; border-radius: 8px;
+            background: rgba(10, 10, 10, 0.8); /* Plus de transparence */
+            backdrop-filter: blur(15px);
+            border: 1px solid #333; border-radius: 8px;
             font-family: var(--font-display); box-shadow: 0 20px 50px rgba(0,0,0,0.8);
         }
-        .terminal-header { background: #1a1a1a; padding: 0.8rem; display: flex; gap: 8px; }
+        .terminal-header { background: rgba(26, 26, 26, 0.8); padding: 0.8rem; display: flex; gap: 8px; }
         .dot { width: 12px; height: 12px; border-radius: 50%; }
         .red { background: #ff5f56; } .yellow { background: #ffbd2e; } .green { background: #27c93f; }
         .terminal-body { padding: 2rem; color: #cfcfcf; }
@@ -168,51 +218,34 @@
         }
         .security-warning { color: var(--secondary); margin-top: 2rem; font-size: 0.9rem; border-left: 3px solid var(--secondary); padding-left: 1rem; }
 
-        /* --- PRICING SECTION --- */
+        /* --- PRICING --- */
         #pricing { padding: 6rem 0; }
-        
-        .pricing-grid {
-            display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap;
-        }
-
+        .pricing-grid { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; }
         .pricing-card {
             background: var(--bg-card); backdrop-filter: var(--blur); border: var(--glass-border);
             padding: 2.5rem; border-radius: 16px; text-align: center; width: 300px;
             transition: var(--transition); position: relative; display: flex; flex-direction: column;
         }
-
         .pricing-card:hover { transform: translateY(-10px); }
-        
-        .pricing-card.featured {
-            border-color: var(--primary);
-            box-shadow: 0 0 30px rgba(191, 0, 255, 0.15);
-        }
+        .pricing-card.featured { border-color: var(--primary); box-shadow: 0 0 30px rgba(191, 0, 255, 0.15); }
         .pricing-card.featured::before {
             content: "BEST SELLER"; position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
             background: var(--primary); color: white; padding: 2px 12px; font-size: 0.7rem; font-weight: bold; border-radius: 50px;
         }
-
         .plan-name { color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; }
         .plan-price { font-family: var(--font-display); font-size: 2.5rem; color: white; margin-bottom: 1.5rem; font-weight: bold; }
         .plan-price span { font-size: 1rem; font-weight: normal; color: var(--text-muted); }
-
         .plan-features { list-style: none; margin-bottom: 2rem; flex-grow: 1; }
         .plan-features li { margin-bottom: 0.8rem; color: #ccc; font-size: 0.9rem; }
         .plan-features li i { color: var(--success); margin-right: 8px; }
-
         .btn-pricing {
             display: block; width: 100%; padding: 0.8rem; border: 1px solid rgba(255,255,255,0.2);
             color: white; text-decoration: none; border-radius: 8px; transition: var(--transition); font-weight: 600;
         }
         .pricing-card.featured .btn-pricing { background: var(--primary); border-color: var(--primary); }
         .btn-pricing:hover { background: white; color: black; }
-
-        .payment-methods {
-            text-align: center; margin-top: 3rem; color: var(--text-muted);
-        }
-        .payment-icons {
-            display: flex; justify-content: center; gap: 1.5rem; margin-top: 1rem; font-size: 1.8rem;
-        }
+        .payment-methods { text-align: center; margin-top: 3rem; color: var(--text-muted); }
+        .payment-icons { display: flex; justify-content: center; gap: 1.5rem; margin-top: 1rem; font-size: 1.8rem; }
         .payment-icons i { transition: var(--transition); }
         .payment-icons i:hover { color: white; transform: scale(1.2); }
 
@@ -235,27 +268,20 @@
             transition: var(--transition); overflow: hidden;
         }
         .team-card:hover { transform: translateY(-10px); border-color: var(--secondary); }
-        
         .profile-img-container {
             width: 120px; height: 120px; margin: 0 auto 1.5rem; position: relative; border-radius: 50%; padding: 5px;
             background: linear-gradient(45deg, var(--primary), transparent, var(--secondary));
         }
         .profile-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: #111; }
         .team-role { color: var(--primary); font-size: 0.9rem; font-family: var(--font-display); margin-bottom: 1.5rem; }
-
-        /* Team Buttons Container */
-        .team-socials {
-            display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1.5rem;
-        }
+        .team-socials { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1.5rem; }
         .btn-social {
             display: flex; align-items: center; justify-content: center; gap: 10px;
             padding: 0.6rem 1rem; border-radius: 8px; text-decoration: none;
             color: white; font-weight: 600; font-size: 0.85rem; transition: var(--transition);
         }
-        /* Discord Button */
         .btn-discord { background: rgba(88, 101, 242, 0.15); border: 1px solid var(--discord); }
         .btn-discord:hover { background: var(--discord); box-shadow: 0 0 15px rgba(88, 101, 242, 0.4); }
-        /* Telegram Button */
         .btn-telegram { background: rgba(34, 158, 217, 0.15); border: 1px solid var(--telegram); }
         .btn-telegram:hover { background: var(--telegram); box-shadow: 0 0 15px rgba(34, 158, 217, 0.4); }
 
@@ -277,14 +303,20 @@
         @media (max-width: 768px) {
             .nav-links { display: none; }
             .hero-title { font-size: 2.5rem; }
-            .bento-grid { grid-template-columns: 1fr; } /* 1 colonne sur mobile */
+            .bento-grid { grid-template-columns: 1fr; }
             .card-full { grid-column: auto; }
         }
     </style>
 </head>
 <body>
 
-    <div class="ambient-glow"></div>
+    <div class="video-background">
+        <video autoplay muted loop playsinline>
+            <source src="assets/galaxy.mp4" type="video/mp4">
+        </video>
+        <div class="video-overlay"></div>
+        <div class="video-noise"></div>
+    </div>
 
     <header>
         <nav>
@@ -308,6 +340,11 @@
 
     <section id="home">
         <div class="container hero-content">
+            <div class="live-badge">
+                <div class="live-dot"></div>
+                STATUS: UNDETECTED
+            </div>
+
             <h1 class="hero-title glitch-text">CLEAN. GHOST. REPEAT.</h1>
             <p class="hero-subtitle">Le meilleur cleaner pour vos cheats. Effacez toutes vos traces, contournez tout.<br>Développé par des cheaters, pour des cheaters.</p>
                 <a href="https://discord.gg/jBP3EfDWhD" target="_blank" class="btn-main">
@@ -395,6 +432,44 @@
                 </div>
 
             </div>
+        </div>
+    </section>
+
+    <section id="comparison">
+        <div class="container">
+            <h2 class="section-title">POURQUOI <span>zCLEANER ?</span></h2>
+            
+            <table class="comparison-table reveal">
+                <thead>
+                    <tr>
+                        <th class="feature-name">FONCTIONNALITÉ</th>
+                        <th>CLEANERS GRATUITS</th>
+                        <th class="highlight">zCLEANER</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="feature-name">Nettoyage Standard (Temp/Prefetch)</td>
+                        <td><i class="fas fa-check check"></i></td>
+                        <td><i class="fas fa-check check"></i></td>
+                    </tr>
+                    <tr>
+                        <td class="feature-name">Bypass Forensics (Shellbags, BAM)</td>
+                        <td><i class="fas fa-times cross"></i></td>
+                        <td><i class="fas fa-check check"></i></td>
+                    </tr>
+                    <tr>
+                        <td class="feature-name">Anti-Recovery (Ecrasement)</td>
+                        <td><i class="fas fa-times cross"></i></td>
+                        <td><i class="fas fa-check check"></i></td>
+                    </tr>
+                    <tr>
+                        <td class="feature-name">Protection HWID</td>
+                        <td><i class="fas fa-times cross"></i></td>
+                        <td><i class="fas fa-check check"></i></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </section>
 
