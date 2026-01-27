@@ -16,7 +16,6 @@
         /* --- 1. CORE VARIABLES & RESET --- */
         :root {
             --bg-dark: #050505;
-            /* On rend les cartes un peu plus transparentes pour voir la galaxie derrière */
             --bg-card: rgba(20, 20, 20, 0.4); 
             --primary: #bf00ff;
             --primary-dim: rgba(191, 0, 255, 0.1);
@@ -26,7 +25,7 @@
             --telegram: #229ED9;
             
             --text-main: #e0e0e0;
-            --text-muted: #d1d5db; /* Texte légèrement plus clair pour le contraste vidéo */
+            --text-muted: #d1d5db;
             
             --glass-border: 1px solid rgba(255, 255, 255, 0.1);
             --blur: blur(20px);
@@ -47,41 +46,38 @@
             line-height: 1.6;
         }
 
-        /* --- 2. VIDEO BACKGROUND (NOUVEAU) --- */
-        .video-background {
-            position: fixed;
-            top: 0; right: 0; bottom: 0; left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -100; /* Tout au fond */
-            overflow: hidden;
+        /* --- 2. PRELOADER (NOUVEAU) --- */
+        #preloader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 0.6s ease-out, visibility 0.6s;
         }
-
-        .video-background video {
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 100vw; height: 100vh;
-            transform: translate(-50%, -50%);
-            object-fit: cover; /* Remplit l'écran sans déformer */
-        }
-
-        /* Overlay sombre pour la lisibilité du texte */
-        .video-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(5, 5, 5, 0.75); /* Ajuste 0.75 pour plus ou moins de clarté */
-            z-index: 1;
-        }
+        #preloader.loaded { opacity: 0; visibility: hidden; }
         
-        /* Texture de bruit par dessus la vidéo pour l'effet "film/cyber" */
+        .loader-logo { width: 80px; margin-bottom: 20px; animation: pulseGlow 1.5s infinite; filter: drop-shadow(0 0 10px var(--primary)); }
+        .loader-text {
+            font-family: var(--font-display); color: var(--primary); letter-spacing: 4px; font-size: 0.9rem;
+            animation: blink 1s infinite;
+        }
+
+        /* --- 3. VIDEO BACKGROUND --- */
+        .video-background {
+            position: fixed; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%; z-index: -100; overflow: hidden;
+        }
+        .video-background video {
+            position: absolute; top: 50%; left: 50%; width: 100vw; height: 100vh; transform: translate(-50%, -50%); object-fit: cover;
+        }
+        .video-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 5, 5, 0.75); z-index: 1;
+        }
         .video-noise {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
-            z-index: 2;
-            pointer-events: none;
+            z-index: 2; pointer-events: none;
         }
 
-        /* --- 3. TYPOGRAPHY --- */
+        /* --- 4. TYPOGRAPHY --- */
         h1, h2, h3, h4 { font-family: var(--font-display); text-transform: uppercase; letter-spacing: -0.5px; }
         .section-title {
             font-size: clamp(2rem, 5vw, 3rem); text-align: center; margin-bottom: 3rem;
@@ -90,17 +86,16 @@
         .section-title span { color: var(--primary); text-shadow: 0 0 15px rgba(191, 0, 255, 0.5); }
         .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
 
-        /* --- 4. HEADER --- */
+        /* --- 5. HEADER & MOBILE MENU (NOUVEAU) --- */
         header {
             position: fixed; top: 0; width: 100%; z-index: 1000;
-            background: rgba(5, 5, 5, 0.3); /* Plus transparent */
-            backdrop-filter: blur(10px);
+            background: rgba(5, 5, 5, 0.3); backdrop-filter: blur(10px);
             border-bottom: var(--glass-border); padding: 0.8rem 0;
         }
         nav { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto; padding: 0 2rem; }
-        
         .logo img { height: 40px; width: auto; display: block; filter: drop-shadow(0 0 5px var(--primary)); }
 
+        /* Desktop Nav */
         .nav-links { display: flex; gap: 2rem; }
         .nav-links a {
             color: var(--text-muted); text-decoration: none; font-size: 0.9rem; font-weight: 600;
@@ -117,7 +112,22 @@
         }
         .btn-top:hover { background: var(--primary); box-shadow: 0 0 20px rgba(191, 0, 255, 0.6); }
 
-        /* --- 5. HERO --- */
+        /* Burger Menu (Hidden on Desktop) */
+        .burger-menu { display: none; cursor: pointer; z-index: 1002; font-size: 1.5rem; color: white; }
+        
+        /* Mobile Overlay */
+        .mobile-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(15px);
+            z-index: 1001; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; gap: 2rem;
+            transform: translateY(-100%); transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+        .mobile-overlay.active { transform: translateY(0); }
+        .mobile-link { font-family: var(--font-display); font-size: 1.8rem; color: white; text-decoration: none; transition: 0.3s; }
+        .mobile-link:hover { color: var(--primary); letter-spacing: 2px; }
+
+        /* --- 6. HERO --- */
         #home { height: 100vh; display: flex; align-items: center; justify-content: center; padding-top: 80px; }
         .hero-content { text-align: center; z-index: 2; max-width: 900px; display: flex; flex-direction: column; align-items: center; }
         
@@ -138,8 +148,7 @@
         
         .glitch-text { position: relative; color: white; }
         .glitch-text::before, .glitch-text::after {
-            content: "CLEAN. GHOST. REPEAT."; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: transparent; /* Transparent pour voir la video */
+            content: "CLEAN. GHOST. REPEAT."; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: transparent;
         }
         .glitch-text::before { left: 2px; text-shadow: -1px 0 var(--secondary); clip-path: inset(44% 0 61% 0); animation: glitch 3s infinite linear alternate-reverse; }
         .glitch-text::after { left: -2px; text-shadow: -1px 0 var(--primary); clip-path: inset(24% 0 21% 0); animation: glitch2 2s infinite linear alternate-reverse; }
@@ -154,7 +163,7 @@
         .btn-main:hover { background: var(--primary); box-shadow: 0 0 40px rgba(191, 0, 255, 0.8); transform: translateY(-2px); }
         .hero-visual { margin-top: 4rem; width: 100%; max-width: 800px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: float 6s ease-in-out infinite; }
 
-        /* --- 6. FEATURES (BENTO GRID) --- */
+        /* --- 7. FEATURES (BENTO GRID) --- */
         #features { padding: 8rem 0; }
         .bento-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
         .card-full { grid-column: 1 / -1; }
@@ -188,17 +197,11 @@
         .check { color: var(--success); font-size: 1.2rem; filter: drop-shadow(0 0 5px var(--success)); }
         .cross { color: #555; font-size: 1.2rem; }
         .feature-name { text-align: left; font-weight: 600; color: #fff; padding-left: 2rem; }
-        @media (max-width: 768px) {
-            .comparison-table { font-size: 0.85rem; }
-            .comparison-table th, .comparison-table td { padding: 1rem 0.5rem; }
-            .feature-name { padding-left: 1rem; }
-        }
 
         /* --- STATUS --- */
         #status { padding: 4rem 0; }
         .terminal-window {
-            background: rgba(10, 10, 10, 0.8); /* Plus de transparence */
-            backdrop-filter: blur(15px);
+            background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(15px);
             border: 1px solid #333; border-radius: 8px;
             font-family: var(--font-display); box-shadow: 0 20px 50px rgba(0,0,0,0.8);
         }
@@ -297,18 +300,31 @@
         @keyframes pulseGlow { 0% { opacity: 0.5; transform: translateX(-50%) scale(1); } 100% { opacity: 0.8; transform: translateX(-50%) scale(1.1); } }
         @keyframes pulseGreen { 0%, 100% { opacity: 1; text-shadow: 0 0 5px var(--success); } 50% { opacity: 0.7; text-shadow: none; } }
         @keyframes spinBorder { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         .show { opacity: 1 !important; transform: translateY(0) !important; }
 
         /* --- RESPONSIVE --- */
         @media (max-width: 768px) {
             .nav-links { display: none; }
+            .btn-top { display: none; } /* On cache le bouton desktop */
+            .burger-menu { display: block; } /* On affiche le burger */
+            
             .hero-title { font-size: 2.5rem; }
             .bento-grid { grid-template-columns: 1fr; }
             .card-full { grid-column: auto; }
+            
+            .comparison-table { font-size: 0.85rem; }
+            .comparison-table th, .comparison-table td { padding: 1rem 0.5rem; }
+            .feature-name { padding-left: 1rem; }
         }
     </style>
 </head>
 <body>
+
+    <div id="preloader">
+        <img src="assets/logo.png" alt="Loading..." class="loader-logo">
+        <div class="loader-text">INITIALIZING...</div>
+    </div>
 
     <div class="video-background">
         <video autoplay muted loop playsinline>
@@ -316,6 +332,18 @@
         </video>
         <div class="video-overlay"></div>
         <div class="video-noise"></div>
+    </div>
+
+    <div class="mobile-overlay" id="mobileMenu">
+        <a href="#home" class="mobile-link">ACCUEIL</a>
+        <a href="#features" class="mobile-link">FONCTIONNALITÉS</a>
+        <a href="#status" class="mobile-link">STATUS</a>
+        <a href="#pricing" class="mobile-link">TARIFS</a>
+        <a href="#faq" class="mobile-link">FAQ</a>
+        <a href="#team" class="mobile-link">ÉQUIPE</a>
+        <a href="https://discord.gg/jBP3EfDWhD" target="_blank" class="btn-top" style="display:flex; margin-top:1rem;">
+            <i class="fab fa-discord"></i> SUPPORT
+        </a>
     </div>
 
     <header>
@@ -332,9 +360,14 @@
                 <a href="#faq">FAQ</a>
                 <a href="#team">ÉQUIPE</a>
             </div>
+            
             <a href="https://discord.gg/jBP3EfDWhD" target="_blank" class="btn-top">
                 <i class="fab fa-discord"></i> SUPPORT
             </a>
+
+            <div class="burger-menu" id="burgerBtn">
+                <i class="fas fa-bars"></i>
+            </div>
         </nav>
     </header>
 
@@ -640,16 +673,53 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             
-            // Scroll Reveal
+            // 1. PRELOADER LOGIC
+            window.addEventListener('load', () => {
+                const preloader = document.getElementById('preloader');
+                preloader.classList.add('loaded');
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                }, 600);
+            });
+
+            // 2. MOBILE MENU LOGIC
+            const burgerBtn = document.getElementById('burgerBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileLinks = document.querySelectorAll('.mobile-link');
+
+            // Open/Close menu
+            burgerBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('active');
+                // Change icon
+                const icon = burgerBtn.querySelector('i');
+                if(mobileMenu.classList.contains('active')) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                } else {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+
+            // Close menu when link clicked
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.remove('active');
+                    burgerBtn.querySelector('i').classList.remove('fa-times');
+                    burgerBtn.querySelector('i').classList.add('fa-bars');
+                });
+            });
+
+            // 3. SCROLL REVEAL
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) entry.target.classList.add('show');
                 });
             }, { threshold: 0.1 });
 
-            document.querySelectorAll('.bento-card, .terminal-window, .team-card, .accordion, .pricing-card, .payment-methods').forEach(el => observer.observe(el));
+            document.querySelectorAll('.bento-card, .terminal-window, .team-card, .accordion, .pricing-card, .payment-methods, .comparison-table').forEach(el => observer.observe(el));
 
-            // Accordion
+            // 4. ACCORDION
             document.querySelectorAll('.accordion-header').forEach(item => {
                 item.addEventListener('click', () => {
                     const parent = item.parentElement;
@@ -665,7 +735,7 @@
                 });
             });
 
-            // Nav Active State
+            // 5. NAV ACTIVE STATE
             window.addEventListener('scroll', () => {
                 let current = '';
                 document.querySelectorAll('section').forEach(section => {
