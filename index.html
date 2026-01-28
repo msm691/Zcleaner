@@ -17,7 +17,7 @@
         :root {
             --bg-dark: #050505;
             --bg-card: rgba(20, 20, 20, 0.4); 
-            --primary: #bf00ff; /* Violet par défaut */
+            --primary: #bf00ff; /* Violet par défaut (zCleaner) */
             --primary-dim: rgba(191, 0, 255, 0.1);
             --secondary: #ff0000;
             --success: #00ff41;
@@ -105,9 +105,12 @@
         }
         .nav-links a:hover, .nav-links a.active { color: white; text-shadow: 0 0 8px rgba(255,255,255,0.5); }
         
-        /* Lien spécial zCommon */
+        /* Liens Spéciaux Produits */
         .link-zcommon { color: #ff0055 !important; text-shadow: 0 0 8px rgba(255, 0, 85, 0.4); }
         .link-zcommon:hover { text-shadow: 0 0 15px #ff0055 !important; }
+        
+        .link-ztrigger { color: #ffaa00 !important; text-shadow: 0 0 8px rgba(255, 170, 0, 0.4); }
+        .link-ztrigger:hover { text-shadow: 0 0 15px #ffaa00 !important; }
 
         .btn-top {
             display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1.2rem;
@@ -250,7 +253,6 @@
 
         /* --- ZCOMMON SECTION (THEME ROUGE) --- */
         #zcommon {
-            /* On change la couleur principale en Rouge pour cette section uniquement */
             --primary: #ff0055; 
             --primary-dim: rgba(255, 0, 85, 0.1);
             position: relative;
@@ -261,31 +263,36 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             margin-bottom: 4rem; text-align: center;
         }
-        /* Correction : Centrage et Proximité */
         .zcommon-badge {
             background: var(--primary); color: white; padding: 5px 15px; 
             border-radius: 50px; font-weight: bold; font-size: 0.8rem;
             box-shadow: 0 0 20px var(--primary-dim); 
-            margin-bottom: 0.5rem; /* Réduit l'espace avec le titre */
-            display: inline-block;
+            margin-bottom: 0.5rem; display: inline-block;
         }
-        /* Grid 2x2 Spécifique pour zCommon */
         .zcommon-pricing-grid {
             display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
             max-width: 800px; margin: 0 auto;
         }
         .zcommon-pricing-grid .pricing-card { width: 100%; }
-
         .zcommon-features { display: flex; justify-content: center; gap: 2rem; margin-bottom: 3rem; flex-wrap: wrap; }
         .zfeature {
-            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 0, 85, 0.3);
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(var(--primary), 0.3); border-color: var(--primary);
             padding: 1rem 2rem; border-radius: 8px; display: flex; align-items: center; gap: 10px;
-            font-family: var(--font-display); color: #fff;
+            font-family: var(--font-display); color: #fff; opacity: 0.9;
         }
         .zfeature i { color: var(--primary); }
         .scan-line {
             width: 100px; height: 2px; background: var(--primary); margin: 0 auto 20px;
             box-shadow: 0 0 15px var(--primary);
+        }
+
+        /* --- ZTRIGGER SECTION (THEME ORANGE) --- */
+        #ztrigger {
+            --primary: #ffaa00; 
+            --primary-dim: rgba(255, 170, 0, 0.1);
+            position: relative;
+            padding: 6rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         /* --- FAQ --- */
@@ -294,8 +301,8 @@
             font-family: var(--font-display); color: var(--primary); font-size: 1.2rem;
             margin: 2rem 0 1rem; padding-left: 10px; border-left: 3px solid var(--primary);
         }
-        /* Couleur spécifique pour le sous-titre FAQ zCommon */
         .faq-subtitle.zcommon-faq-title { color: #ff0055; border-color: #ff0055; margin-top: 3rem; }
+        .faq-subtitle.ztrigger-faq-title { color: #ffaa00; border-color: #ffaa00; margin-top: 3rem; }
 
         .accordion { display: flex; flex-direction: column; gap: 1rem; max-width: 800px; margin: 0 auto; }
         .accordion-item { background: var(--bg-card); border: var(--glass-border); border-radius: 8px; overflow: hidden; transition: var(--transition); }
@@ -358,7 +365,6 @@
             .comparison-table th, .comparison-table td { padding: 1rem 0.5rem; }
             .feature-name { padding-left: 1rem; }
             
-            /* Responsive Grid zCommon Mobile */
             .zcommon-pricing-grid { grid-template-columns: 1fr; }
         }
     </style>
@@ -366,6 +372,7 @@
 <body>
 
     <div id="preloader">
+        <img src="assets/logo.png" alt="Loading..." class="loader-logo">
         <div class="loader-text">INITIALIZING...</div>
     </div>
 
@@ -383,7 +390,7 @@
         <a href="#status" class="mobile-link">STATUS</a>
         <a href="#pricing" class="mobile-link">TARIFS</a>
         <a href="#zcommon" class="mobile-link link-zcommon">zCOMMON (AI)</a>
-        <a href="#faq" class="mobile-link">FAQ</a>
+        <a href="#ztrigger" class="mobile-link link-ztrigger">zTRIGGER</a> <a href="#faq" class="mobile-link">FAQ</a>
         <a href="#team" class="mobile-link">ÉQUIPE</a>
         <a href="https://discord.gg/jBP3EfDWhD" target="_blank" class="btn-top" style="display:flex; margin-top:1rem;">
             <i class="fab fa-discord"></i> SUPPORT
@@ -402,7 +409,7 @@
                 <a href="#status">STATUS</a>
                 <a href="#pricing">TARIFS</a>
                 <a href="#zcommon" class="link-zcommon">zCOMMON (AI)</a>
-                <a href="#faq">FAQ</a>
+                <a href="#ztrigger" class="link-ztrigger">zTRIGGER</a> <a href="#faq">FAQ</a>
                 <a href="#team">ÉQUIPE</a>
             </div>
             
@@ -701,6 +708,65 @@
         </div>
     </section>
 
+    <section id="ztrigger">
+        <div class="container">
+            
+            <div class="zcommon-header reveal">
+                <div class="zcommon-badge">REFLEX GOD</div>
+                <h2 class="section-title" style="margin-top: 0; left: auto; transform: none;">zTRIGGER <span>COLOR BOT</span></h2>
+                <div class="scan-line"></div>
+                <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto;">
+                    Réflexes surhumains et mouvements impossibles. Le combo parfait pour le Close-Range sur FiveM.
+                </p>
+            </div>
+
+            <div class="zcommon-features reveal">
+                <div class="zfeature"><i class="fas fa-mouse-pointer"></i> Humanized Trigger</div>
+                <div class="zfeature"><i class="fas fa-running"></i> Macro Strafe</div>
+                <div class="zfeature"><i class="fas fa-sliders-h"></i> 100% Adjustable</div>
+                <div class="zfeature"><i class="fas fa-ghost"></i> Full External</div>
+            </div>
+
+            <div class="pricing-grid reveal">
+                
+                <div class="pricing-card">
+                    <h3 class="plan-name">Weekly</h3>
+                    <div class="plan-price">4.99€<span>/semaine</span></div>
+                    <ul class="plan-features">
+                        <li><i class="fas fa-check"></i> TriggerBot + Strafe</li>
+                        <li><i class="fas fa-check"></i> Mises à jour Auto</li>
+                        <li><i class="fas fa-check"></i> Support Client</li>
+                    </ul>
+                    <a href="https://zcleaner.mysellauth.com/product/ztrigger" target="_blank" class="btn-pricing">Acheter</a>
+                </div>
+
+                <div class="pricing-card">
+                    <h3 class="plan-name">Monthly</h3>
+                    <div class="plan-price">8.99€<span>/mois</span></div>
+                    <ul class="plan-features">
+                        <li><i class="fas fa-check"></i> <strong>Best Value</strong></li>
+                        <li><i class="fas fa-check"></i> TriggerBot + Strafe</li>
+                        <li><i class="fas fa-check"></i> Configs Legit/Rage</li>
+                    </ul>
+                    <a href="https://zcleaner.mysellauth.com/product/ztrigger" target="_blank" class="btn-pricing">Acheter</a>
+                </div>
+
+                <div class="pricing-card featured">
+                    <h3 class="plan-name">LIFETIME</h3>
+                    <div class="plan-price">14.99€<span>/vie</span></div>
+                    <ul class="plan-features">
+                        <li><i class="fas fa-check"></i> <strong>Paiement Unique</strong></li>
+                        <li><i class="fas fa-check"></i> Accès à Vie</li>
+                        <li><i class="fas fa-check"></i> Grade Discord "Trigger User"</li>
+                        <li><i class="fas fa-check"></i> Support Prioritaire</li>
+                    </ul>
+                    <a href="https://zcleaner.mysellauth.com/product/ztrigger" target="_blank" class="btn-pricing">OBTENIR</a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
     <section id="faq">
         <div class="container">
             <h2 class="section-title"><span>F.A.Q</span></h2>
@@ -735,6 +801,13 @@
                 <div class="accordion-item">
                     <div class="accordion-header">Quelle est la config PC requise ? <i class="fas fa-chevron-down"></i></div>
                     <div class="accordion-content"><p>Nous recommandons une carte graphique NVIDIA (GTX 1050 ou mieux) pour que l'IA tourne sans impacter vos FPS.</p></div>
+                </div>
+
+                <h3 class="faq-subtitle ztrigger-faq-title">QUESTIONS zTRIGGER</h3>
+
+                <div class="accordion-item">
+                    <div class="accordion-header">Comment fonctionne le Strafe ? <i class="fas fa-chevron-down"></i></div>
+                    <div class="accordion-content"><p>La macro Strafe automatise les mouvements gauche-droite (Q/D) de manière aléatoire pour vous rendre impossible à toucher, tout en gardant une visée stable.</p></div>
                 </div>
 
             </div>
@@ -851,6 +924,7 @@
                 });
             }, { threshold: 0.1 });
 
+            // On ajoute les nouvelles classes à l'observer
             document.querySelectorAll('.bento-card, .terminal-window, .team-card, .accordion, .pricing-card, .payment-methods, .comparison-table, .zcommon-header, .zcommon-features, .zcommon-pricing-grid').forEach(el => observer.observe(el));
 
             // 4. ACCORDION
